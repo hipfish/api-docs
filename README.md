@@ -25,6 +25,7 @@ POST /archive/file/ {file, archive_config, hosting_config}
 This will returns IPFS address of uploaded file, with some other metadata (such as size of file and archive configuration).
 
 There is a maximum file size that can be uploaded this way. I don't know what it is yet, probably some MB. Hopefully it;s large enough to post a photo or video from a phone, so 10Mb, but may need to be smaller than that. There might also be some limits which are related to time (size+bandwidth).
+Maximal file size is configurable in Nginx for classic deployment and 6MB (including request metadata) for Lambda. But these restrictions are generally avoidable (for example, by AWS S3 POST upload).
 
 The `file` parameter is mandatory. With no file posted, it doesn't make sense.
 
@@ -34,29 +35,29 @@ The `hosting_config` is optional with default of none. If not none (and if archi
 
 Another way to get a file in the archive is to pull it into the archive from IPFS:
 ```
-POST /archive/ipfs/ {IPFS-ADDRESS, hosting_config}
+POST /archive/ipfs/ {IPFS-ADDRESS, hosting_config, archive_config}
 ```
 This has the limitation that the file has to be available from IPFS (already published somewhere). It has the advantage that a arbitrarially large files may be archived this way. The limits on the size of the file that can be downloaded are configured in the user profile, and are linked to the financial costs of downloading and storing very large files.
 
 `hosting_metadata` is same as for `POST /archive/file/`.
 
-When this method is called, it causes a background process to retrieved from IPFS network and saved to the archive. The method returns an address (`/archive/download_status/GUID`) where the status of the download can be queried.
+When this method is called, it causes a background process to retrieved from IPFS network and saved to the archive. The method returns an address (`/archive/download_status/IPFS-ADDRESS`) where the status of the download can be queried.
 
 i.e.
 ```
-GET /archive/download_status/GUID
+GET /archive/download_status/IPFS-ADDRESS
 ```
 This returns one of two things.
 
 If the download is still in progress, it returns status of download (if still in progress). This includes time spent since download started, ammount downloaded so far, and maybe some groovy array of IPFS stuff the hosts the data it streaming from.
 
-If the download has completed, the method returns a simple structure containing the IPFS address and file metadata (size of file, time download started, time it finished, maybe other stuff too). We eventually keep this download_status for as long as the file is in the archive (or do we? we could delete the GUID file after a month)
+If the download has completed, the method returns a simple structure containing the IPFS address and file metadata (size of file, time download started, time it finished, maybe other stuff too). We eventually keep this download_status for as long as the file is in the archive (or do we? we could delete the IPFS-ADDRESS file after a month)
 
-When the download is complete, the response returned by `/archive/download_status/GUID` includes the IPFS address and the file metadata. When a file is archived (i.e. after a sucessful call of `POST /archive/ipfs {IPFS-ADDRESS}`, we can also fetch the file metadata like this:
+When the download is complete, the response returned by `/archive/download_status/IPFS-ADDRESS` includes the IPFS address and the file metadata. When a file is archived (i.e. after a sucessful call of `POST /archive/ipfs {IPFS-ADDRESS}`, we can also fetch the file metadata like this:
 ```
 GET /archive/ipfs/IPFS-ADDRESS/
 ```
-This returns the full file metadata, including hosting configuration (disposal date, backup redundancy, etc). So the only data we would need to keep to service download_status/GUID requests is the mapping between GUID and ipfs_address. We could chain the request to `GET /archive/ipfs/IPFS-ADDRESS/` to fetch the rest of it.
+This returns the full file metadata, including hosting configuration (disposal date, backup redundancy, etc). So the only data we would need to keep to service download_status/IPFS-ADDRESS requests is the mapping between IPFS-ADDRESS and ipfs_address. We could chain the request to `GET /archive/ipfs/IPFS-ADDRESS/` to fetch the rest of it.
 
 If we want to change the archival config for a file, we simply PUT new config to the archive, like this:
 ```
