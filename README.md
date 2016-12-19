@@ -18,6 +18,12 @@ In the MVP we will create new tokens using the web UI. It's entirely possible th
 
 Once you can access the API because you have a valid token, you need files in the archive before you can publish them in IPFS.
 
+```gherkin
+As an archivist
+I want to post files into my archive
+So that I can archive files without needing local IPFS infrastructure
+```
+
 One way to get a file in the archive is to post it directly there:
 ````
 POST /archive/file/ {file, archive_config, hosting_config}
