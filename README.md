@@ -29,9 +29,24 @@ Maximal file size is configurable in Nginx for classic deployment and 6MB (inclu
 
 The `file` parameter is mandatory. With no file posted, it doesn't make sense.
 
-The `archive_config` parameter is optional. If not supplied, defaults are used. I don't know what the archive_config parameters are yet but they include `store until` (file will be disposed after that date). They may also `privacy_lock`; if true makes file unpublishable (i.e. pure private archive), default to False. I have a few ideas about requirements to support various access control policies but they are not resolved yet.
+The `archive_config` is a json collection of the following values. If not supplied, defaults are used.
 
-The `hosting_config` is optional with default of none. If not none (and if archive_config.privacy_lock is false), this chains an API call to the right part of `/hosting/*` so that once archived, the file is immediately published (per hosting_config).
+| Parameter    | Type      | Default         | Description                                                                                |
+| ------------ | --------- | --------------- | ------------------------------------------------------------------------------------------ |
+| disposal     | Date/Time | Today + 7 years | Delete the file from the archive not before this date                                      |
+| privacy_lock | Boolean   | False           | If true, this file MUST NOT be published via IPFS (raise error if attempted)               |
+| backup       | integer   | 1               | If 0, backup is not perfromed. If 1, single backup system. If 2, redundant backup systems. |
+
+
+The `hosting_config` is a json collection of the following values. The `hosting_config` is optional with default of none. If not none (and if archive_config.privacy_lock is false), this chains an API call to the right part of `/hosting/*` so that once archived, the file is immediately published (per hosting_config).
+
+| Parameter    | Type      | Default        | Description                                                        |
+| ------------ | --------- | -------------- | ------------------------------------------------------------------ |
+| publish_from | Date/Time | Now            | Date/Time from which the archived file will be published via IPFS  |
+| publish_to   | Date/Time | Now + 3 months | Date/Time until which the archived file will be published via IPFS |
+
+If `archive_config.privacy_lock == True` and `hosting_config` is not None, an error is raised.
+
 
 Another way to get a file in the archive is to pull it into the archive from IPFS:
 ```
