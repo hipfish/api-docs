@@ -1,7 +1,9 @@
 Archive
 =======
 
-I think our interface needs the concept of "archive", which is an intermediary between the conventional CDN "origin" and the hosting arrangement.
+One difference between HiPFiSH and a traditional (HTTP/HTTPS) Content Delivery Network is the concept Archive. With a traditional CDN, resources are proxied from an *origin* (or *upstream*). With IPFS, the origin resource may or may not exist, or may or may not be available.
+
+With HiPFiSH, resources are first loaded into the archive, and then they can be served via IPFS.
 
 .. graphviz::
 
@@ -11,7 +13,7 @@ I think our interface needs the concept of "archive", which is an intermediary b
       post_local;
       post_local -> local_file;
       post_local -> archive;
-      http_origin [label=rectangle];
+      http_origin [shape=rectangle];
       post_http;
       post_http -> http_origin;
       post_http -> archive;
