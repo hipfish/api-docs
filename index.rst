@@ -1,5 +1,5 @@
-HiPFiSH API docs
-================
+HiPFiSH docs
+============
 
 .. toctree::
    :maxdepth: 2
@@ -9,9 +9,3 @@ HiPFiSH API docs
    console
    api
 
-   authentication
-   archive
-   hosting
-   search
-   statistics
-   billing
