@@ -70,31 +70,19 @@ The API uses a HATEOS design. This means the design incorporates natural HTTP ve
 The CLI tool uses the REST API. Therefor, everything that is possible via the CLI is also possible via the API.
 
 
+More Information
+----------------
 
-+---------------+----------------------------------------------------------------------------------------------+
-| Path          | Description                                                                                  |
-+===============+==============================================================================================+
-| /archive/     | Unlike a traditional HTTP(S) CDN, an IPFS CDN can not assume the file is available as a URL. |
-|               | Resources must somehow be placed in the hipfish archive before they can be reliably hosted.  |
-|               | This archive is actually quite useful on it's own (it's durable, and can be kept private for |
-|               | record keeping use-cases). This is a low-level API.                                          |
-+---------------+----------------------------------------------------------------------------------------------+
-| /hosting/     | Once a file is in the archive, it can be reliably published on IPFS using the hosting API.   |
-|               | This low-level API provides fine-grained controll over hosting.                              |
-+---------------+----------------------------------------------------------------------------------------------+
-| /collections/ | A high-level API that allows users to archive and host collections of files as a group. This |
-|               | API is quite similar to traditional CDN APIs, and is designed for maximum convenience. It's  |
-|               | probably the one you want :)                                                                 |
-+---------------+----------------------------------------------------------------------------------------------+
+This documentation covers:
+ * getting started: Try this out to get a feel for we web UI
+ * applications: Example user-stories, who might find hipfish useful
+ * console tool: Understand the features and concepts behind them
+ * API: Online resources and verbs for accessing them programatically
 
+The documentation itself:
+ * is published at https://hipfish.readthedocs.io/
+ * is managed at https://github.com/hipfish/hipfish-docs/
 
-Low level `archive` api:
- * POST file to archive, returns archive job GUID
- * POST URL to spider that does `HTTP GET` into archive, returns archive job GUID 
- * POST IPFS address to spider that does `IPFS GET` into archive, returns archive job GUID
- * GET archive job GUID, returns status of archive job
- * `GET /archive/ipfs-hash/config` returns status/config of archive (if possible)
- * `PUT /archive/upfs-hash/config` updates config of archive
+If there are issues with the documents or there is something you would like help with, please feel free to raise a ticket at http://github.com/hipfish/hipfish-docs/issues
 
-Low level "hosting" api:
- * POST ipfs address to hosting collection, if status of address is "archived" then idempotently adds file to hosting collection
+The http://hipfish.io/ website is obviously a key resource, and the email helpdesk at support@hipfish.io is also available.
