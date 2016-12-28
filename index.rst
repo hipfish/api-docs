@@ -5,6 +5,10 @@ HiPFiSH API docs
    :maxdepth: 2
 
    overview
+   applications
+   console
+   api
+
    authentication
    archive
    hosting

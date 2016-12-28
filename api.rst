@@ -1,5 +1,22 @@
+Application Programming Interface
+=================================
+
+TODO: document the API using HATEOS pattern (organise by resource subheading, then resource/verb sub-subheading)
+
+
+Authentication
+--------------
+
+Access to the HiPFiSH API is controlled via API tokens. These can be managed via the Web UI.
+
+TODO:
+ * insert screen shots and HOWTO for API token management and account management
+ * feature specification for API token management and account management
+ * would we ever use the API to manage API tokens (how to bootstrap it - would require account creation, credit card etc, the whole thing?)
+
+
 Archive
-=======
+-------
 
 One difference between HiPFiSH and a traditional (HTTP/HTTPS) Content Delivery Network is the concept Archive. With a traditional CDN, resources are proxied from an *origin* (or *upstream*). With IPFS, the origin resource may or may not exist, or may or may not be available.
 
@@ -35,3 +52,35 @@ All these methods could take some time (non-blocking I/O), so they should immedi
  * a collection of URLs, (each returning a single status)
 
 The HTTP(S) and IPFS addresses may or may not succeed, due to file availability. So the 
+
+
+Hosting
+-------
+
+TODO:
+ * document hosting requirements
+ * design hosting API
+
+
+Search
+------
+
+TODO:
+ * document search requirements
+
+
+Statistics
+----------
+
+TODO:
+ * document statistics requirements
+ * design statistics API
+ * note similarity and difference to search API (comment elements/paramaters please)
+
+
+Billing
+-------
+
+TODO:
+ * document billing requirements
+ * design billing API
