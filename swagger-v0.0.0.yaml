@@ -1,7 +1,12 @@
 swagger: '2.0'
 info:
   title: Hipfish file API
-  description: API to manage bucket and files-directories
+  description: |
+    API to manage bucket and files-directories
+    
+    Known problems:
+    * some endpoints are not implemented
+    * file and directory is the same thing in backend currently. So operations like delete, move, bucketize work generally the same. So in any place, until othervise is specified, file = directory = item. Shall we rename 'file' to 'item' then?
   version: "0.0.0"
 host: hipfish.io
 schemes:
@@ -21,7 +26,7 @@ paths:
           description: Information about your user and auth details.
 
   /file/multipart/:
-    get:
+    post:
       summary: Upload a file by multipart/form-data method
       description: |
         Creates job to store uploaded file in our secure storage. Returns job identificatior, which can be traded to this file UUID when upload is done.
@@ -48,6 +53,36 @@ paths:
       responses:
         201:
           description: Upload scheduled
+
+  /file/ipfs/:
+    post:
+      summary: Upload a file by ipfs method
+      description: |
+        Creates job to store file or directory with given IPFS hash in our secure storage. This file is being fetched by our IPFS nodes, but don't get published specifically - until you publish the file/directory deliberately it's serving is not quaranteed. 
+      parameters:
+        - name: ipfs_hash
+          in: formData
+          description: The QmHash to fetch
+          required: true
+          type: string
+          format: string
+        - name: filename
+          in: formData
+          description: The human-readable filename of the file. IPFS can't provide such information, so we have to ask for it.
+          required: false
+          type: string
+          format: string
+        - name: parent_directory
+          in: formData
+          type: string
+          format: uuid
+          description: UUID of directory to put the file on. Empty to put in the root namespace.
+      tags:
+        - Files
+      responses:
+        201:
+          description: Download and storage has been scheduled
+
   /job/{job_id}/:
     parameters:
       - name: job_id
@@ -166,6 +201,8 @@ paths:
         * move_to_bucket
           * parameter bucket: UUID of the bucket (or readable name)
           * after item is moved to bucket it can't be updated anymore (but can be removed or another item may be created in stage and moved to bucket)
+        * TODO: ipfs_publish file/directory
+        * TODO: ipfs_unpiblish file/directory
       responses:
         200:
           description: Success
@@ -180,3 +217,35 @@ paths:
         204:
           description: The file has been removed
 
+  /file/{file_id}/data:
+    parameters:
+      - name: file_id
+        in: path
+        required: true
+        description: File UUID
+        type: string
+        format: uuid
+    get:
+      summary: get file content
+      responses:
+        200:
+          description: File content, binary
+
+  /stage/directory/:
+    post:
+      summary: Create new directory in stage. Directories in stage are pretty virtual, they are just for manaing file structure, but when they are published to buckets they receive some QmHash and becoming immutable.
+      parameters:
+        - name: directory_name
+          in: formData
+          required: true
+          type: string
+          format: string
+        - name: parent_directory
+          in: formData
+          type: string
+          format: uuid
+      tags:
+        - Directories
+      responses:
+        201:
+          description: directory created
