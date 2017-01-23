@@ -1,0 +1,182 @@
+swagger: '2.0'
+info:
+  title: Hipfish file API
+  description: API to manage bucket and files-directories
+  version: "0.0.0"
+host: hipfish.io
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /api/v0
+produces:
+  - application/json
+paths:
+  /demo_auth:
+    get:
+      summary: Return authentification info
+      description: |
+        Helper endpoint to check if provided token is still valid. Returns 403 error if not.
+      responses:
+        200:
+          description: Information about your user and auth details.
+
+  /file/multipart/:
+    get:
+      summary: Upload a file by multipart/form-data method
+      description: |
+        Creates job to store uploaded file in our secure storage. Returns job identificatior, which can be traded to this file UUID when upload is done.
+      parameters:
+        - name: file
+          in: formData
+          description: The file content to store
+          required: true
+          type: file
+          format: file
+        - name: filename
+          in: formData
+          description: The human-readable filename of the file
+          required: false
+          type: string
+          format: string
+        - name: parent_directory
+          in: formData
+          type: string
+          format: uuid
+          description: UUID of directory to put the file on. Empty to put in the root namespace.
+      tags:
+        - Files
+      responses:
+        201:
+          description: Upload scheduled
+  /job/{job_id}/:
+    parameters:
+      - name: job_id
+        in: path
+        required: true
+        description: the UUID of job to display
+        type: string
+        format: uuid
+    get:
+      summary: Job details
+      description: Get job status and details
+      
+      tags:
+        - Jobs
+      responses:
+        200:
+          description: Job details
+        404:
+          description: Job not found
+  /bucket/:
+    get:
+      summary: List of buckets
+      tags:
+        - Buckets
+      responses:
+        200:
+          description: Buckets list
+  /bucket/{bucket_id}:
+    parameters:
+      - name: bucket_id
+        in: path
+        required: true
+        description: Bucket UUID (or readable_name if no colissions)
+        type: string
+        format: uuid
+    get:
+      summary: Get bucket information
+      tags:
+        - Buckets
+      responses:
+        200:
+          description: Bucket info
+    patch:
+      summary: Update the bucket
+      tags:
+        - Buckets
+      responses:
+        200:
+          description: Bucket updated
+    delete:
+      summary: Delete the bucket
+      description: Requires bucket to be empty already
+      tags:
+        - Buckets
+      responses:
+        204:
+          description: Bucket removed
+  /bucket/{bucket_id}/{file_id}:
+    parameters:
+      - name: bucket_id
+        in: path
+        required: true
+        description: Bucket UUID (or readable_name if no colissions)
+        type: string
+        format: uuid
+      - name: file_id
+        in: path
+        required: true
+        description: File UUID
+        type: string
+        format: uuid
+    get:
+      summary: Get file metadata
+      tags:
+        - Buckets
+      responses:
+        200:
+          description: File info
+    delete:
+      summary: Delete the file from the bucket
+      description: |
+        Recursively removes the file or directory if item in root namespace.
+        You can't remove subfiles or subdirectories, because it changes the parent directory, so only root objects can be altered this way.
+      tags:
+        - Buckets
+        - Files
+      responses:
+        204:
+          description: Bucket has been removed
+
+
+  /file/{file_id}/:
+    parameters:
+      - name: file_id
+        in: path
+        required: true
+        description: File UUID
+        type: string
+        format: uuid
+    get:
+      summary: Get file metadata
+      description: return general info about the file
+      tags:
+        - Files
+      responses:
+        200:
+          description: File metadata
+    post:
+      summary: Perform file operation
+      description: |
+        Supported operations are passed by 'action' field:
+        * move_to_directory
+          * parameter target_id - UUID of target directory
+          * item (file or directory) changes it's parent
+          * pass empty value to move it to root
+        * move_to_bucket
+          * parameter bucket: UUID of the bucket (or readable name)
+          * after item is moved to bucket it can't be updated anymore (but can be removed or another item may be created in stage and moved to bucket)
+      responses:
+        200:
+          description: Success
+    delete:
+      summary: Delete the file from the stage
+      description: |
+        Recursively removes the file or directory if item in root namespace.
+        Requires item to be in stage, not in bucket. Use bucket management endpoints to work with bucket files.
+      tags:
+        - Files
+      responses:
+        204:
+          description: The file has been removed
+
